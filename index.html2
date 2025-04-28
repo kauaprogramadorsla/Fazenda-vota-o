@@ -1,0 +1,15 @@
+<!-- Banner -->
+<div class="banner">
+    olá povo
+</div>
+
+<style>
+.banner {
+    background-color: #ccc; /* cinza */
+    color: black; /* preto */
+    padding: 20px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+}
+</style>
