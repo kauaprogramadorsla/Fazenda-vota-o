@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Votação</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container, .containerVoto {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .botao {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .botao:hover {
+            background: #45a049;
+        }
+        .opcao {
+            background: #e0e0e0;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .opcao:hover {
+            background: #d1d1d1;
+        }
+        .mensagem, .mensagemTorcida {
+            margin-top: 20px;
+            font-size: 20px;
+            color: green;
+            display: none;
+        }
+        #senhaArea {
+            margin-top: 30px;
+        }
+        #senhaInput {
+            padding: 10px;
+            font-size: 18px;
+            width: 200px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+            width: 90%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Escolha o tipo de votação:</h2>
+    <button class="botao" onclick="abrirVotoUnico()">Voto Único</button>
+    <button class="botao" onclick="abrirVotoTorcida()">Voto da Torcida</button>
+</div>
+
+<!-- Container para Voto Único -->
+<div class="containerVoto" id="votoUnicoContainer" style="display: none;">
+    <h3>Voto Único</h3>
+    <div class="opcao" onclick="votarUnico('Alvs')">Alvs</div>
+    <div class="opcao" onclick="votarUnico('Kaua')">Kaua</div>
+    <div class="opcao" onclick="votarUnico('Max')">Max</div>
+    <div class="mensagem" id="mensagemUnico">Parabéns, você já votou (único)!</div>
+</div>
+
+<!-- Container para Voto da Torcida -->
+<div class="containerVoto" id="votoTorcidaContainer" style="display: none;">
+    <h3>Voto da Torcida</h3>
+    <div class="opcao" onclick="votarTorcida('Alvs')">Alvs</div>
+    <div class="opcao" onclick="votarTorcida('Kaua')">Kaua</div>
+    <div class="opcao" onclick="votarTorcida('Max')">Max</div>
+    <div class="mensagemTorcida" id="mensagemTorcida"></div>
+</div>
+
+<div id="senhaArea">
+    <input type="password" id="senhaInput" placeholder="Digite a senha" oninput="verificarSenha()">
+</div>
+
+<div id="resultado"></div>
+
+<script>
+    // Guardar votos
+    let votosUnico = { 'Alvs': 0, 'Kaua': 0, 'Max': 0 };
+    let votosTorcida = { 'Alvs': 0, 'Kaua': 0, 'Max': 0 };
+    let votouUnico = false;
+
+    function abrirVotoUnico() {
+        document.getElementById('votoUnicoContainer').style.display = 'block';
+        document.getElementById('votoTorcidaContainer').style.display = 'none';
+    }
+
+    function abrirVotoTorcida() {
+        document.getElementById('votoTorcidaContainer').style.display = 'block';
+        document.getElementById('votoUnicoContainer').style.display = 'none';
+    }
+
+    function votarUnico(nome) {
+        if (votouUnico) return;
+        votosUnico[nome]++;
+        document.getElementById('votoUnicoContainer').style.display = 'none';
+        document.getElementById('mensagemUnico').style.display = 'block';
+        votouUnico = true;
+    }
+
+    function votarTorcida(nome) {
+        votosTorcida[nome]++;
+        document.getElementById('votoTorcidaContainer').style.display = 'none';
+        let mensagem = document.getElementById('mensagemTorcida');
+        mensagem.innerHTML = `Você votou em <strong>${nome}</strong>!`;
+        mensagem.style.display = 'block';
+
+        let botaoVotarNovamente = document.createElement('button');
+        botaoVotarNovamente.textContent = "Votar novamente";
+        botaoVotarNovamente.className = "botao";
+        botaoVotarNovamente.onclick = function() {
+            mensagem.style.display = 'none';
+            mensagem.innerHTML = '';
+            abrirVotoTorcida();
+        };
+        mensagem.appendChild(document.createElement('br'));
+        mensagem.appendChild(botaoVotarNovamente);
+    }
+
+    function verificarSenha() {
+        let senha = document.getElementById('senhaInput').value;
+        if (senha === "000") {
+            mostrarResultado();
+        }
+    }
+
+    function mostrarResultado() {
+        let totalUnico = votosUnico['Alvs'] + votosUnico['Kaua'] + votosUnico['Max'];
+        let totalTorcida = votosTorcida['Alvs'] + votosTorcida['Kaua'] + votosTorcida['Max'];
+
+        let html = "<h3>Resultados:</h3>";
+
+        for (let nome of ['Alvs', 'Kaua', 'Max']) {
+            let percUnico = totalUnico === 0 ? 0 : (votosUnico[nome] / totalUnico) * 100;
+            let percTorcida = totalTorcida === 0 ? 0 : (votosTorcida[nome] / totalTorcida) * 100;
+            let media = ((percUnico + percTorcida) / 2).toFixed(1);
+
+            html += `<p><strong>${nome}</strong>:<br>
+                    Voto Único: ${percUnico.toFixed(1)}%<br>
+                    Voto Torcida: ${percTorcida.toFixed(1)}%<br>
+                    <strong>Média Final: ${media}%</strong></p>`;
+        }
+
+        document.getElementById('resultado').innerHTML = html;
+        document.getElementById('resultado').style.display = 'block';
+    }
+</script>
+
+</body>
+  </html>
